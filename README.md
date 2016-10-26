@@ -1,4 +1,4 @@
-[![Express Logo](https://i.cloudup.com/zfY6lL7eFa-3000x3000.png)](http://expressjs.com/)
+[![Express Logo](https://s3.amazonaws.com/bucket01.elvenware.com/images/elvenwarelogo.png)](http://elvenware.com/)
 
 Charlie's fork of the [Express'](https://www.npmjs.com/package/express) application generator.
 

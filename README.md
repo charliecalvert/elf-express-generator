@@ -1,6 +1,6 @@
 [![Express Logo](https://i.cloudup.com/zfY6lL7eFa-3000x3000.png)](http://expressjs.com/)
 
-[Express'](https://www.npmjs.com/package/express) application generator.
+Charlie's fork of the [Express'](https://www.npmjs.com/package/express) application generator.
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -11,7 +11,7 @@
 ## Installation
 
 ```sh
-$ npm install -g express-generator
+$ npm install -g elf-express-generator
 ```
 
 ## Quick Start
@@ -21,7 +21,7 @@ The quickest way to get started with express is to utilize the executable `expre
 Create the app:
 
 ```bash
-$ express /tmp/foo && cd /tmp/foo
+$ elf-express /tmp/foo && cd /tmp/foo
 ```
 
 Install dependencies:

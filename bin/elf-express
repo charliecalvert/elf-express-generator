@@ -109,6 +109,7 @@ function createApplication(app_name, path) {
   var www = loadTemplate('js/www');
   var index = loadTemplate('js/routes/index.js');
   var users = loadTemplate('js/routes/users.js');
+  var control = loadTemplate('js/public/javascripts/control.js');
 
   // CSS
   var css = loadTemplate('css/style.css');
@@ -119,7 +120,10 @@ function createApplication(app_name, path) {
 
   mkdir(path, function(){
     mkdir(path + '/public');
-    mkdir(path + '/public/javascripts');
+    mkdir(path + '/public/javascripts', function() {
+        write(path + '/public/javascripts/control.js', control);
+        complete();
+    });
     mkdir(path + '/public/images');
     mkdir(path + '/public/stylesheets', function(){
       switch (program.css) {
@@ -138,12 +142,13 @@ function createApplication(app_name, path) {
         default:
           write(path + '/public/stylesheets/style.css', css);
       }
+      
       complete();
     });
 
     mkdir(path + '/routes', function(){
       write(path + '/routes/index.js', index);
-      write(path + '/routes/users.js', users);
+      write(path + '/routes/users.js', users);      
       complete();
     });
 

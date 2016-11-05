@@ -100,9 +100,15 @@ function createApplication(app_name, path) {
   // Elf Grunt
   var grunt = loadTemplate('Gruntfile.js');
   var jscsrc = loadTemplate('.jscsrc');
-  mkdir(path);
-  write(path + '/Gruntfile.js', grunt);
-  write(path + '/.jscsrc', jscsrc);
+  var bowerrc = loadTemplate('.bowerrc');
+  var bower = loadTemplate('bower.json');
+  mkdir(path, function() {
+	write(path + '/Gruntfile.js', grunt);
+	write(path + '/.jscsrc', jscsrc);
+	write(path + '/.bowerrc', bowerrc);
+	write(path + '/bower.json', bower);
+	complete();
+  });
   
   // JavaScript
   var app = loadTemplate('js/app.js');
@@ -110,6 +116,7 @@ function createApplication(app_name, path) {
   var index = loadTemplate('js/routes/index.js');
   var users = loadTemplate('js/routes/users.js');
   var control = loadTemplate('js/public/javascripts/control.js');
+  var mainRequire = loadTemplate('js/public/javascripts/main.js');
 
   // CSS
   var css = loadTemplate('css/style.css');
@@ -122,6 +129,7 @@ function createApplication(app_name, path) {
     mkdir(path + '/public');
     mkdir(path + '/public/javascripts', function() {
         write(path + '/public/javascripts/control.js', control);
+        write(path + '/public/javascripts/main.js', mainRequire);
         complete();
     });
     mkdir(path + '/public/images');

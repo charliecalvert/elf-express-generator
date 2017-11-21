@@ -143,9 +143,25 @@ function createApplication (name, path) {
     console.log()
   }
 
+  // Elf Grunt
+  var grunt = loadTemplate('Gruntfile.js');
+  var jscsrc = loadTemplate('.jscsrc');
+  var bowerrc = loadTemplate('.bowerrc');
+  var bower = loadTemplate('bower.json');
+  mkdir(path, function() {
+	write(path + '/Gruntfile.js', grunt);
+	write(path + '/.jscsrc', jscsrc);
+	write(path + '/.bowerrc', bowerrc);
+	write(path + '/bower.json', bower);
+	complete();
+  });
+  
   // JavaScript
   var app = loadTemplate('js/app.js')
   var www = loadTemplate('js/www')
+  var control = loadTemplate('js/public/javascripts/control.js');
+  var mainRequire = loadTemplate('js/public/javascripts/main.js');
+
 
   // App name
   www.locals.name = name
@@ -281,6 +297,16 @@ function createApplication (name, path) {
         'morgan': '~1.9.0',
         'serve-favicon': '~2.4.5'
       }
+      , devDependencies: {
+            "grunt": "^1.0.1",
+            "grunt-contrib-clean": "^1.0.0",
+            "grunt-contrib-jshint": "^1.0.0",
+            "grunt-jsbeautifier": "^0.2.13",
+            "grunt-jscs": "^3.0.1",
+            "grunt-karma": "^2.0.0",
+            "jshint-stylish": "^2.2.1",
+            "karma": "^1.3.0"
+        }
     }
 
     switch (program.view) {

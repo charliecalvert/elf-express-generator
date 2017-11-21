@@ -143,24 +143,11 @@ function createApplication (name, path) {
     console.log()
   }
 
-  // Elf Grunt
-  var grunt = loadTemplate('Gruntfile.js');
-  var jscsrc = loadTemplate('.jscsrc');
-  var bowerrc = loadTemplate('.bowerrc');
-  var bower = loadTemplate('bower.json');
-  mkdir(path, function() {
-	write(path + '/Gruntfile.js', grunt);
-	write(path + '/.jscsrc', jscsrc);
-	write(path + '/.bowerrc', bowerrc);
-	write(path + '/bower.json', bower);
-	complete();
-  });
-  
+
+
   // JavaScript
   var app = loadTemplate('js/app.js')
   var www = loadTemplate('js/www')
-  var control = loadTemplate('js/public/javascripts/control.js');
-  var mainRequire = loadTemplate('js/public/javascripts/main.js');
 
 
   // App name
@@ -170,9 +157,24 @@ function createApplication (name, path) {
   app.locals.modules = Object.create(null)
   app.locals.uses = []
 
+  // Elf Grunt
+
+  mkdir(path, function() {
+    copyTemplate('Gruntfile.js', path + '/Gruntfile.js');
+    copyTemplate('.jscsrc', path + '/.jscsrc');
+    copyTemplate('.bowerrc', path + '/.bowerrc');
+    copyTemplate('bower.json', path + '/bower.json');
+    complete();
+  });
+
+
   mkdir(path, function () {
     mkdir(path + '/public', function () {
-      mkdir(path + '/public/javascripts')
+      mkdir(path + '/public/javascripts', function() {
+        copyTemplate('js/public/javascripts/control.js', path +  '/public/javascripts/control.js');
+        copyTemplate('js/public/javascripts/main.js', path  + '/public/javascripts/main.js');      
+        complete();
+      })
       mkdir(path + '/public/images')
       mkdir(path + '/public/stylesheets', function () {
         switch (program.css) {

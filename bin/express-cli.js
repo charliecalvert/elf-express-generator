@@ -431,7 +431,7 @@ function createApplication (name, dir) {
   }
 
   console.log()
-}
+});
 
 /**
  * Create an app name from a directory path, fitting npm naming requirements.

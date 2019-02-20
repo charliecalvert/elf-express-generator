@@ -35,7 +35,7 @@
   "main": "bin/express-cli.js",
   "preferGlobal": true,
   "bin": {
-    "express": "./bin/express-cli.js"
+    "elf-express": "./bin/express-cli.js"
   },
   "devDependencies": {
     "eslint": "5.14.1",

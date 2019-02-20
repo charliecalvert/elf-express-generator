@@ -1,18 +1,15 @@
 module.exports = function(grunt) {
-    'use strict';
+    "use strict";
 
     grunt.initConfig({
-
-        pkg: '<json:package.json>',
+        pkg: "<json:package.json>",
 
         jshint: {
-            files: ['**/*.js'],
+            files: ["**/*.js"],
 
             options: {
-                ignores: [
-                    '**/node_modules/**', '**/components/**'
-                ],
-                reporter: require('jshint-stylish'),
+                ignores: ["**/node_modules/**", "**/components/**"],
+                reporter: require("jshint-stylish"),
                 strict: true,
                 jasmine: true
             }
@@ -20,38 +17,37 @@ module.exports = function(grunt) {
 
         clean: {
             yourTarget: {
-                src: ['**/node_modules/**', '**/components/**']
+                src: ["**/node_modules/**", "**/components/**"]
             }
         },
 
         jscs: {
-            src: '**/*.js',
+            src: "**/*.js",
             options: {
-                config: '.jscsrc'
+                config: ".jscsrc"
             }
         },
 
-        'jsbeautifier': {
-            files: ['**/*.js', '!**/node_modules/**', '!**/components/**'],
+        jsbeautifier: {
+            files: ["**/*.js", "!**/node_modules/**", "!**/components/**"],
             options: {
-                'indentSize': 4
+                indentSize: 4
             }
         },
 
         karma: {
             karma: {
-                configFile: 'karma.conf.js'
+                configFile: "karma.conf.js"
             }
         }
-
     });
 
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-jscs');
-    grunt.loadNpmTasks('grunt-jsbeautifier');
-    grunt.loadNpmTasks('grunt-karma');
-    grunt.registerTask('beautify', ['jsbeautifier']);
-    grunt.registerTask('check', ['beautify', 'jscs', 'jshint']);
-    grunt.registerTask('test', ['jshint', 'karma']);
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-jscs");
+    grunt.loadNpmTasks("grunt-jsbeautifier");
+    grunt.loadNpmTasks("grunt-karma");
+    grunt.registerTask("beautify", ["jsbeautifier"]);
+    grunt.registerTask("check", ["beautify", "jscs", "jshint"]);
+    grunt.registerTask("test", ["jshint", "karma"]);
 };

@@ -4,19 +4,17 @@
  */
 
 requirejs.config({
-    baseUrl: '.',
+    baseUrl: ".",
     paths: {
-        'jquery': 'components/jquery/dist/jquery',
-        'control': 'javascripts/control'
+        jquery: "components/jquery/dist/jquery",
+        control: "javascripts/control"
     }
 });
 
-requirejs(['jquery'], function($) {
-    'use strict';
+requirejs(["jquery"], function($) {
+    "use strict";
 
-    requirejs(['control'], function(control) {
-        $(document).ready(function() {
-
-        });
+    requirejs(["control"], function(control) {
+        $(document).ready(function() {});
     });
 });

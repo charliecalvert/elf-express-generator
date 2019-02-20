@@ -1,4 +1,5 @@
 .idea
+go
 
 node_modules/
 npm-debug.log

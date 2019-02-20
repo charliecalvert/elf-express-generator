@@ -23,18 +23,18 @@ process.exit = exit;
 
 // CLI
 
-around(program, "optionMissingArgument", function(fn, args) {
+around(program, "optionMissingArgument", function (fn, args) {
     program.outputHelp();
     fn.apply(this, args);
-    return { args: [], unknown: [] };
+    return {args: [], unknown: []};
 });
 
-before(program, "outputHelp", function() {
+before(program, "outputHelp", function () {
     // track if help was shown for unknown option
     this._helpShown = true;
 });
 
-before(program, "unknownOption", function() {
+before(program, "unknownOption", function () {
     // allow unknown options if help was shown, to prevent trailing error
     this._allowUnknownOption = this._helpShown;
 
@@ -89,10 +89,10 @@ if (!exit.exited) {
  * Install an around function; AOP.
  */
 
-function around(obj, method, fn) {
+function around (obj, method, fn) {
     const old = obj[method];
 
-    obj[method] = function() {
+    obj[method] = function () {
         const args = new Array(arguments.length);
         for (let i = 0; i < args.length; i++) args[i] = arguments[i];
         return fn.call(this, old, args);
@@ -103,10 +103,10 @@ function around(obj, method, fn) {
  * Install a before function; AOP.
  */
 
-function before(obj, method, fn) {
+function before (obj, method, fn) {
     const old = obj[method];
 
-    obj[method] = function() {
+    obj[method] = function () {
         fn.call(this);
         old.apply(this, arguments);
     };
@@ -116,13 +116,13 @@ function before(obj, method, fn) {
  * Prompt for confirmation on STDOUT/STDIN
  */
 
-function confirm(msg, callback) {
+function confirm (msg, callback) {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
 
-    rl.question(msg, function(input) {
+    rl.question(msg, function (input) {
         rl.close();
         callback(/^y|yes|ok|true$/i.test(input));
     });
@@ -132,7 +132,7 @@ function confirm(msg, callback) {
  * Copy file from template directory.
  */
 
-function copyTemplate(from, to) {
+function copyTemplate (from, to) {
     write(to, fs.readFileSync(path.join(TEMPLATE_DIR, from), "utf-8"));
 }
 
@@ -140,10 +140,10 @@ function copyTemplate(from, to) {
  * Copy multiple files from template directory.
  */
 
-function copyTemplateMulti(fromDir, toDir, nameGlob) {
+function copyTemplateMulti (fromDir, toDir, nameGlob) {
     fs.readdirSync(path.join(TEMPLATE_DIR, fromDir))
-        .filter(minimatch.filter(nameGlob, { matchBase: true }))
-        .forEach(function(name) {
+        .filter(minimatch.filter(nameGlob, {matchBase: true}))
+        .forEach(function (name) {
             copyTemplate(path.join(fromDir, name), path.join(toDir, name));
         });
 }
@@ -155,7 +155,7 @@ function copyTemplateMulti(fromDir, toDir, nameGlob) {
  * @param {string} dir
  */
 
-function createApplication(name, dir) {
+function createApplication (name, dir) {
     console.log();
 
     // Package
@@ -197,17 +197,15 @@ function createApplication(name, dir) {
 
     // Elf Grunt
 
-    mkdir(path, function() {
-        copyTemplate("Gruntfile.js", path + "/Gruntfile.js");
-        copyTemplate(".jscsrc", path + "/.jscsrc");
-        copyTemplate(".bowerrc", path + "/.bowerrc");
-        copyTemplate("bower.json", path + "/bower.json");
-        //complete();
-    });
+    copyTemplate("Gruntfile.js", path + "/Gruntfile.js");
+    copyTemplate(".jscsrc", path + "/.jscsrc");
+    copyTemplate(".bowerrc", path + "/.bowerrc");
+    copyTemplate("bower.json", path + "/bower.json");
+    //complete();
 
-    mkdir(path, function() {
-        mkdir(path + "/public", function() {
-            mkdir(path + "/public/javascripts", function() {
+    mkdir(path, function () {
+        mkdir(path + "/public", function () {
+            mkdir(path + "/public/javascripts", function () {
                 copyTemplate(
                     "js/public/javascripts/control.js",
                     path + "/public/javascripts/control.js"
@@ -398,11 +396,11 @@ function createApplication(name, dir) {
 
     // Index router mount
     app.locals.localModules.indexRouter = "./routes/index";
-    app.locals.mounts.push({ path: "/", code: "indexRouter" });
+    app.locals.mounts.push({path: "/", code: "indexRouter"});
 
     // User router mount
     app.locals.localModules.usersRouter = "./routes/users";
-    app.locals.mounts.push({ path: "/users", code: "usersRouter" });
+    app.locals.mounts.push({path: "/users", code: "usersRouter"});
 
     // Template support
     switch (program.view) {
@@ -415,31 +413,31 @@ function createApplication(name, dir) {
             pkg.dependencies.adaro = "~1.0.4";
             break;
         case "ejs":
-            app.locals.view = { engine: "ejs" };
+            app.locals.view = {engine: "ejs"};
             pkg.dependencies.ejs = "~2.6.1";
             break;
         case "hbs":
-            app.locals.view = { engine: "hbs" };
+            app.locals.view = {engine: "hbs"};
             pkg.dependencies.hbs = "~4.0.1";
             break;
         case "hjs":
-            app.locals.view = { engine: "hjs" };
+            app.locals.view = {engine: "hjs"};
             pkg.dependencies.hjs = "~0.0.6";
             break;
         case "jade":
-            app.locals.view = { engine: "jade" };
+            app.locals.view = {engine: "jade"};
             pkg.dependencies.jade = "~1.11.0";
             break;
         case "pug":
-            app.locals.view = { engine: "pug" };
+            app.locals.view = {engine: "pug"};
             pkg.dependencies.pug = "2.0.0-beta11";
             break;
         case "twig":
-            app.locals.view = { engine: "twig" };
+            app.locals.view = {engine: "twig"};
             pkg.dependencies.twig = "~0.10.3";
             break;
         case "vash":
-            app.locals.view = { engine: "vash" };
+            app.locals.view = {engine: "vash"};
             pkg.dependencies.vash = "~0.12.4";
             break;
         default:
@@ -492,7 +490,7 @@ function createApplication(name, dir) {
  * @param {String} pathName
  */
 
-function createAppName(pathName) {
+function createAppName (pathName) {
     return path
         .basename(pathName)
         .replace(/[^A-Za-z0-9.-]+/g, "-")
@@ -507,8 +505,8 @@ function createAppName(pathName) {
  * @param {Function} fn
  */
 
-function emptyDirectory(dir, fn) {
-    fs.readdir(dir, function(err, files) {
+function emptyDirectory (dir, fn) {
+    fs.readdir(dir, function (err, files) {
         if (err && err.code !== "ENOENT") throw err;
         fn(!files || !files.length);
     });
@@ -518,11 +516,11 @@ function emptyDirectory(dir, fn) {
  * Graceful exit for async STDIO
  */
 
-function exit(code) {
+function exit (code) {
     // flush output for Node.js Windows pipe bug
     // https://github.com/joyent/node/issues/6247 is just one bug example
     // https://github.com/visionmedia/mocha/issues/333 has a good discussion
-    function done() {
+    function done () {
         if (!draining--) _exit(code);
     }
 
@@ -531,7 +529,7 @@ function exit(code) {
 
     exit.exited = true;
 
-    streams.forEach(function(stream) {
+    streams.forEach(function (stream) {
         // submit empty write request and wait for completion
         draining += 1;
         stream.write("", done);
@@ -544,7 +542,7 @@ function exit(code) {
  * Determine if launched from cmd.exe
  */
 
-function launchedFromCmd() {
+function launchedFromCmd () {
     return process.platform === "win32" && process.env._ === undefined;
 }
 
@@ -552,14 +550,14 @@ function launchedFromCmd() {
  * Load template file.
  */
 
-function loadTemplate(name) {
+function loadTemplate (name) {
     const contents = fs.readFileSync(
         path.join(__dirname, "..", "templates", name + ".ejs"),
         "utf-8"
     );
     const locals = Object.create(null);
 
-    function render() {
+    function render () {
         return ejs.render(contents, locals, {
             escape: util.inspect
         });
@@ -575,12 +573,13 @@ function loadTemplate(name) {
  * Main program.
  */
 
-function main() {
+function main () {
     // Path
     const destinationPath = program.args.shift() || ".";
 
     // App name
-    const appName = createAppName(path.resolve(destinationPath)) || "hello-world";
+    const appName =
+        createAppName(path.resolve(destinationPath)) || "hello-world";
 
     // View engine
     if (program.view === true) {
@@ -594,17 +593,17 @@ function main() {
     if (program.view === true) {
         warning(
             "the default view engine will not be jade in future releases\n" +
-                "use `--view=jade' or `--help' for additional options"
+            "use `--view=jade' or `--help' for additional options"
         );
         program.view = "jade";
     }
 
     // Generate application
-    emptyDirectory(destinationPath, function(empty) {
+    emptyDirectory(destinationPath, function (empty) {
         if (empty || program.force) {
             createApplication(appName, destinationPath);
         } else {
-            confirm("destination is not empty, continue? [y/N] ", function(ok) {
+            confirm("destination is not empty, continue? [y/N] ", function (ok) {
                 if (ok) {
                     process.stdin.destroy();
                     createApplication(appName, destinationPath);
@@ -624,7 +623,7 @@ function main() {
  * @param {string} dir
  */
 
-function mkdir(base, dir) {
+function mkdir (base, dir) {
     const loc = path.join(base, dir);
 
     console.log("   \x1b[36mcreate\x1b[0m : " + loc + path.sep);
@@ -638,8 +637,8 @@ function mkdir(base, dir) {
  * @param {String} newName
  */
 
-function renamedOption(originalName, newName) {
-    return function(val) {
+function renamedOption (originalName, newName) {
+    return function (val) {
         warning(
             util.format(
                 "option `%s' has been renamed to `%s'",
@@ -657,9 +656,9 @@ function renamedOption(originalName, newName) {
  * @param {String} message
  */
 
-function warning(message) {
+function warning (message) {
     console.error();
-    message.split("\n").forEach(function(line) {
+    message.split("\n").forEach(function (line) {
         console.error("  warning: %s", line);
     });
     console.error();
@@ -672,7 +671,7 @@ function warning(message) {
  * @param {String} str
  */
 
-function write(file, str, mode) {
-    fs.writeFileSync(file, str, { mode: mode || MODE_0666 });
+function write (file, str, mode) {
+    fs.writeFileSync(file, str, {mode: mode || MODE_0666});
     console.log("   \x1b[36mcreate\x1b[0m : " + file);
 }

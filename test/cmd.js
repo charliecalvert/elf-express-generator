@@ -8,22 +8,20 @@ var path = require('path')
 var request = require('supertest')
 var rimraf = require('rimraf')
 var spawn = require('child_process').spawn
+var tmp = require('tmp')
 var utils = require('./support/utils')
 var validateNpmName = require('validate-npm-package-name')
 
+var APP_START_STOP_TIMEOUT = 10000
 var PKG_PATH = path.resolve(__dirname, '..', 'package.json')
 var BIN_PATH = path.resolve(path.dirname(PKG_PATH), require(PKG_PATH).bin.express)
-var TEMP_DIR = path.resolve(__dirname, '..', 'temp', String(process.pid + Math.random()))
+var NPM_INSTALL_TIMEOUT = 60000
+var TEMP_DIR = tmp.dirSync().name
 
 describe('express(1)', function () {
-  before(function (done) {
-    this.timeout(30000)
-    cleanup(done)
-  })
-
   after(function (done) {
     this.timeout(30000)
-    cleanup(done)
+    rimraf(TEMP_DIR, done)
   })
 
   describe('(no args)', function () {
@@ -35,7 +33,7 @@ describe('express(1)', function () {
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
         ctx.stderr = stderr
         ctx.stdout = stdout
-        assert.equal(ctx.files.length, 17)
+        assert.equal(ctx.files.length, 16)
         done()
       })
     })
@@ -45,7 +43,7 @@ describe('express(1)', function () {
     })
 
     it('should provide debug instructions', function () {
-      assert.ok(/DEBUG=express\(1\)-\(no-args\):\* (?:& )?npm start/.test(ctx.stdout))
+      assert.ok(/DEBUG=express-1-no-args:\* (?:& )?npm start/.test(ctx.stdout))
     })
 
     it('should have basic files', function () {
@@ -64,26 +62,25 @@ describe('express(1)', function () {
       var file = path.resolve(ctx.dir, 'package.json')
       var contents = fs.readFileSync(file, 'utf8')
       assert.equal(contents, '{\n' +
-        '  "name": "express(1)-(no-args)",\n' +
+        '  "name": "express-1-no-args",\n' +
         '  "version": "0.0.0",\n' +
         '  "private": true,\n' +
         '  "scripts": {\n' +
         '    "start": "node ./bin/www"\n' +
         '  },\n' +
         '  "dependencies": {\n' +
-        '    "body-parser": "~1.18.2",\n' +
         '    "cookie-parser": "~1.4.3",\n' +
         '    "debug": "~2.6.9",\n' +
-        '    "express": "~4.15.5",\n' +
+        '    "express": "~4.16.1",\n' +
+        '    "http-errors": "~1.6.2",\n' +
         '    "jade": "~1.11.0",\n' +
-        '    "morgan": "~1.9.0",\n' +
-        '    "serve-favicon": "~2.4.5"\n' +
+        '    "morgan": "~1.9.0"\n' +
         '  }\n' +
         '}\n')
     })
 
     it('should have installable dependencies', function (done) {
-      this.timeout(30000)
+      this.timeout(NPM_INSTALL_TIMEOUT)
       npmInstall(ctx.dir, done)
     })
 
@@ -100,60 +97,61 @@ describe('express(1)', function () {
       })
 
       after('stop app', function (done) {
+        this.timeout(APP_START_STOP_TIMEOUT)
         this.app.stop(done)
       })
 
       it('should start app', function (done) {
-        this.timeout(5000)
+        this.timeout(APP_START_STOP_TIMEOUT)
         this.app.start(done)
       })
 
       it('should respond to HTTP request', function (done) {
         request(this.app)
-        .get('/')
-        .expect(200, /<title>Express<\/title>/, done)
+          .get('/')
+          .expect(200, /<title>Express<\/title>/, done)
       })
 
       it('should generate a 404', function (done) {
         request(this.app)
-        .get('/does_not_exist')
-        .expect(404, /<h1>Not Found<\/h1>/, done)
+          .get('/does_not_exist')
+          .expect(404, /<h1>Not Found<\/h1>/, done)
       })
     })
 
     describe('when directory contains spaces', function () {
-      var ctx = setupTestEnvironment('foo bar (BAZ!)')
+      var ctx0 = setupTestEnvironment('foo bar (BAZ!)')
 
       it('should create basic app', function (done) {
-        run(ctx.dir, [], function (err, output) {
+        run(ctx0.dir, [], function (err, output) {
           if (err) return done(err)
-          assert.equal(utils.parseCreatedFiles(output, ctx.dir).length, 17)
+          assert.equal(utils.parseCreatedFiles(output, ctx0.dir).length, 16)
           done()
         })
       })
 
       it('should have a valid npm package name', function () {
-        var file = path.resolve(ctx.dir, 'package.json')
+        var file = path.resolve(ctx0.dir, 'package.json')
         var contents = fs.readFileSync(file, 'utf8')
         var name = JSON.parse(contents).name
-        assert.ok(validateNpmName(name).validForNewPackages)
-        assert.equal(name, 'foo-bar-(baz!)')
+        assert.ok(validateNpmName(name).validForNewPackages, 'package name "' + name + '" is valid')
+        assert.equal(name, 'foo-bar-baz')
       })
     })
 
     describe('when directory is not a valid name', function () {
-      var ctx = setupTestEnvironment('_')
+      var ctx1 = setupTestEnvironment('_')
 
       it('should create basic app', function (done) {
-        run(ctx.dir, [], function (err, output) {
+        run(ctx1.dir, [], function (err, output) {
           if (err) return done(err)
-          assert.equal(utils.parseCreatedFiles(output, ctx.dir).length, 17)
+          assert.equal(utils.parseCreatedFiles(output, ctx1.dir).length, 16)
           done()
         })
       })
 
       it('should default to name "hello-world"', function () {
-        var file = path.resolve(ctx.dir, 'package.json')
+        var file = path.resolve(ctx1.dir, 'package.json')
         var contents = fs.readFileSync(file, 'utf8')
         var name = JSON.parse(contents).name
         assert.ok(validateNpmName(name).validForNewPackages)
@@ -190,6 +188,45 @@ describe('express(1)', function () {
         assert.ok(/error: unknown option/.test(stderr))
         done()
       })
+    })
+  })
+
+  describe('<dir>', function () {
+    var ctx = setupTestEnvironment(this.fullTitle())
+
+    it('should create basic app in directory', function (done) {
+      runRaw(ctx.dir, ['foo'], function (err, code, stdout, stderr) {
+        if (err) return done(err)
+        ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
+        ctx.stderr = stderr
+        ctx.stdout = stdout
+        assert.equal(ctx.files.length, 17)
+        done()
+      })
+    })
+
+    it('should provide change directory instructions', function () {
+      assert.ok(/cd foo/.test(ctx.stdout))
+    })
+
+    it('should provide install instructions', function () {
+      assert.ok(/npm install/.test(ctx.stdout))
+    })
+
+    it('should provide debug instructions', function () {
+      assert.ok(/DEBUG=foo:\* (?:& )?npm start/.test(ctx.stdout))
+    })
+
+    it('should have basic files', function () {
+      assert.notEqual(ctx.files.indexOf('foo/bin/www'), -1)
+      assert.notEqual(ctx.files.indexOf('foo/app.js'), -1)
+      assert.notEqual(ctx.files.indexOf('foo/package.json'), -1)
+    })
+
+    it('should have jade templates', function () {
+      assert.notEqual(ctx.files.indexOf('foo/views/error.jade'), -1)
+      assert.notEqual(ctx.files.indexOf('foo/views/index.jade'), -1)
+      assert.notEqual(ctx.files.indexOf('foo/views/layout.jade'), -1)
     })
   })
 
@@ -231,7 +268,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--css', 'less'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17, 'should have 17 files')
+          assert.equal(ctx.files.length, 16, 'should have 16 files')
           done()
         })
       })
@@ -247,7 +284,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -257,24 +294,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should respond with stylesheet', function (done) {
           request(this.app)
-          .get('/stylesheets/style.css')
-          .expect(200, /sans-serif/, done)
+            .get('/stylesheets/style.css')
+            .expect(200, /sans-serif/, done)
         })
       })
     })
@@ -286,7 +324,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--css', 'stylus'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17, 'should have 17 files')
+          assert.equal(ctx.files.length, 16, 'should have 16 files')
           done()
         })
       })
@@ -302,7 +340,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -312,24 +350,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should respond with stylesheet', function (done) {
           request(this.app)
-          .get('/stylesheets/style.css')
-          .expect(200, /sans-serif/, done)
+            .get('/stylesheets/style.css')
+            .expect(200, /sans-serif/, done)
         })
       })
     })
@@ -342,7 +381,7 @@ describe('express(1)', function () {
       run(ctx.dir, ['--ejs'], function (err, stdout) {
         if (err) return done(err)
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-        assert.equal(ctx.files.length, 16, 'should have 16 files')
+        assert.equal(ctx.files.length, 15, 'should have 15 files')
         done()
       })
     })
@@ -366,7 +405,7 @@ describe('express(1)', function () {
       run(ctx.dir, ['--git'], function (err, stdout) {
         if (err) return done(err)
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-        assert.equal(ctx.files.length, 18, 'should have 18 files')
+        assert.equal(ctx.files.length, 17, 'should have 17 files')
         done()
       })
     })
@@ -411,7 +450,7 @@ describe('express(1)', function () {
       run(ctx.dir, ['--hbs'], function (err, stdout) {
         if (err) return done(err)
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-        assert.equal(ctx.files.length, 17)
+        assert.equal(ctx.files.length, 16)
         done()
       })
     })
@@ -459,7 +498,7 @@ describe('express(1)', function () {
       run(ctx.dir, ['--hogan'], function (err, stdout) {
         if (err) return done(err)
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-        assert.equal(ctx.files.length, 16)
+        assert.equal(ctx.files.length, 15)
         done()
       })
     })
@@ -483,6 +522,62 @@ describe('express(1)', function () {
     })
   })
 
+  describe('--no-view', function () {
+    var ctx = setupTestEnvironment(this.fullTitle())
+
+    it('should create basic app without view engine', function (done) {
+      run(ctx.dir, ['--no-view'], function (err, stdout) {
+        if (err) return done(err)
+        ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
+        assert.equal(ctx.files.length, 13)
+        done()
+      })
+    })
+
+    it('should have basic files', function () {
+      assert.notEqual(ctx.files.indexOf('bin/www'), -1)
+      assert.notEqual(ctx.files.indexOf('app.js'), -1)
+      assert.notEqual(ctx.files.indexOf('package.json'), -1)
+    })
+
+    it('should not have views directory', function () {
+      assert.equal(ctx.files.indexOf('views'), -1)
+    })
+
+    it('should have installable dependencies', function (done) {
+      this.timeout(NPM_INSTALL_TIMEOUT)
+      npmInstall(ctx.dir, done)
+    })
+
+    describe('npm start', function () {
+      before('start app', function () {
+        this.app = new AppRunner(ctx.dir)
+      })
+
+      after('stop app', function (done) {
+        this.timeout(APP_START_STOP_TIMEOUT)
+        this.app.stop(done)
+      })
+
+      it('should start app', function (done) {
+        this.timeout(APP_START_STOP_TIMEOUT)
+        this.app.start(done)
+      })
+
+      it('should respond to HTTP request', function (done) {
+        request(this.app)
+          .get('/')
+          .expect(200, /<title>Express<\/title>/, done)
+      })
+
+      it('should generate a 404', function (done) {
+        request(this.app)
+          .get('/does_not_exist')
+          .expect(404, /Cannot GET \/does_not_exist/, done)
+      })
+    })
+  })
+
   describe('--pug', function () {
     var ctx = setupTestEnvironment(this.fullTitle())
 
@@ -490,7 +585,7 @@ describe('express(1)', function () {
       run(ctx.dir, ['--pug'], function (err, stdout) {
         if (err) return done(err)
         ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-        assert.equal(ctx.files.length, 17)
+        assert.equal(ctx.files.length, 16)
         done()
       })
     })
@@ -553,7 +648,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'dust'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 16, 'should have 16 files')
+          assert.equal(ctx.files.length, 15, 'should have 15 files')
           done()
         })
       })
@@ -570,7 +665,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -580,24 +675,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -609,7 +705,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'ejs'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 16, 'should have 16 files')
+          assert.equal(ctx.files.length, 15, 'should have 15 files')
           done()
         })
       })
@@ -626,7 +722,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -636,24 +732,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -665,7 +762,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'hbs'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17)
+          assert.equal(ctx.files.length, 16)
           done()
         })
       })
@@ -690,7 +787,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -700,24 +797,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -729,7 +827,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'hjs'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 16)
+          assert.equal(ctx.files.length, 15)
           done()
         })
       })
@@ -753,7 +851,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -763,24 +861,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -792,7 +891,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'pug'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17)
+          assert.equal(ctx.files.length, 16)
           done()
         })
       })
@@ -817,7 +916,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -827,24 +926,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -856,7 +956,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'twig'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17)
+          assert.equal(ctx.files.length, 16)
           done()
         })
       })
@@ -881,7 +981,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -891,24 +991,25 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
@@ -920,7 +1021,7 @@ describe('express(1)', function () {
         run(ctx.dir, ['--view', 'vash'], function (err, stdout) {
           if (err) return done(err)
           ctx.files = utils.parseCreatedFiles(stdout, ctx.dir)
-          assert.equal(ctx.files.length, 17)
+          assert.equal(ctx.files.length, 16)
           done()
         })
       })
@@ -945,7 +1046,7 @@ describe('express(1)', function () {
       })
 
       it('should have installable dependencies', function (done) {
-        this.timeout(30000)
+        this.timeout(NPM_INSTALL_TIMEOUT)
         npmInstall(ctx.dir, done)
       })
 
@@ -955,40 +1056,30 @@ describe('express(1)', function () {
         })
 
         after('stop app', function (done) {
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.stop(done)
         })
 
         it('should start app', function (done) {
-          this.timeout(5000)
+          this.timeout(APP_START_STOP_TIMEOUT)
           this.app.start(done)
         })
 
         it('should respond to HTTP request', function (done) {
           request(this.app)
-          .get('/')
-          .expect(200, /<title>Express<\/title>/, done)
+            .get('/')
+            .expect(200, /<title>Express<\/title>/, done)
         })
 
         it('should generate a 404', function (done) {
           request(this.app)
-          .get('/does_not_exist')
-          .expect(404, /<h1>Not Found<\/h1>/, done)
+            .get('/does_not_exist')
+            .expect(404, /<h1>Not Found<\/h1>/, done)
         })
       })
     })
   })
 })
-
-function cleanup (dir, callback) {
-  if (typeof dir === 'function') {
-    callback = dir
-    dir = TEMP_DIR
-  }
-
-  rimraf(dir, function (err) {
-    callback(err)
-  })
-}
 
 function npmInstall (dir, callback) {
   var env = utils.childEnvironment()
@@ -1025,11 +1116,11 @@ function run (dir, args, callback) {
 
 function runRaw (dir, args, callback) {
   var argv = [BIN_PATH].concat(args)
-  var exec = process.argv[0]
+  var binp = process.argv[0]
   var stderr = ''
   var stdout = ''
 
-  var child = spawn(exec, argv, {
+  var child = spawn(binp, argv, {
     cwd: dir
   })
 
@@ -1060,7 +1151,7 @@ function setupTestEnvironment (name) {
 
   after('cleanup environment', function (done) {
     this.timeout(30000)
-    cleanup(ctx.dir, done)
+    rimraf(ctx.dir, done)
   })
 
   return ctx

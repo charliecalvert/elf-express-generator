@@ -6,7 +6,6 @@ Charlie's fork of the [Express'](https://www.npmjs.com/package/express) applicat
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
 [![Windows Build][appveyor-image]][appveyor-url]
-[![Gratipay][gratipay-image]][gratipay-url]
 
 ## Installation
 
@@ -46,6 +45,7 @@ This generator can also be further configured with the following command line fl
         --hbs            add handlebars engine support
     -H, --hogan          add hogan.js engine support
     -v, --view <engine>  add view <engine> support (dust|ejs|hbs|hjs|jade|pug|twig|vash) (defaults to jade)
+        --no-view        use static html instead of view engine
     -c, --css <engine>   add stylesheet <engine> support (less|stylus|compass|sass) (defaults to plain css)
         --git            add .gitignore
     -f, --force          force on non-empty directory
@@ -63,5 +63,3 @@ This generator can also be further configured with the following command line fl
 [appveyor-url]: https://ci.appveyor.com/project/dougwilson/generator
 [downloads-image]: https://img.shields.io/npm/dm/express-generator.svg
 [downloads-url]: https://npmjs.org/package/express-generator
-[gratipay-image]: https://img.shields.io/gratipay/dougwilson.svg
-[gratipay-url]: https://gratipay.com/dougwilson/

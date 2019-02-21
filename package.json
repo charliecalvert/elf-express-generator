@@ -23,7 +23,7 @@
     "app",
     "api"
   ],
-  "repository": "charliecalvert/generator",
+  "repository": "charliecalvert/elf-express-generator",
   "license": "MIT",
   "dependencies": {
     "commander": "2.19.0",
@@ -32,10 +32,10 @@
     "mkdirp": "0.5.1",
     "sorted-object": "^2.0.1"
   },
-  "main": "bin/express-cli.js",
+  "main": "bin/elf-express-cli.js",
   "preferGlobal": true,
   "bin": {
-    "elf-express": "./bin/express-cli.js"
+    "elf-express": "./bin/elf-express-cli.js"
   },
   "devDependencies": {
     "mocha": "6.0.0",

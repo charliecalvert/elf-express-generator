@@ -32,10 +32,10 @@
     "mkdirp": "0.5.1",
     "sorted-object": "^2.0.1"
   },
-  "main": "bin/elf-express-cli.js",
+  "main": "bin/express-cli.js",
   "preferGlobal": true,
   "bin": {
-    "elf-express": "./bin/elf-express-cli.js"
+    "elf-express": "./bin/express-cli.js"
   },
   "devDependencies": {
     "mocha": "6.0.0",

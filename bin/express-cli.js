@@ -327,7 +327,7 @@ function createApplication (name, dir) {
     }
 
     // ELF CODE
-    copyTemplate("js/public/javascripts/control.js", path.join(dir, "control.js"));
+    copyTemplate("js/public/javascripts/control.js", path.join(dir + "public/javascripts", "control.js"));
 
     // sort dependencies like npm(1)
     pkg.dependencies = sortedObject(pkg.dependencies);

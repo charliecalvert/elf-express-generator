@@ -326,6 +326,9 @@ function createApplication (name, dir) {
         copyTemplate("js/gitignore", path.join(dir, ".gitignore"));
     }
 
+    // ELF CODE
+    copyTemplate("js/public/javascripts/control.js", path.join(dir, "control.js"));
+
     // sort dependencies like npm(1)
     pkg.dependencies = sortedObject(pkg.dependencies);
 

@@ -331,7 +331,7 @@ function createApplication (name, dir) {
     //copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
 
     // destination.txt will be created or overwritten by default.
-    fs.copyFileSync("images/favicon.ico", path.join(dir + "/public/favicon.ico"));
+    fs.copyFileSync("templates/images/favicon.ico", path.join(dir + "/public/favicon.ico"));
     //console.log('source.txt was copied to destination.txt');
 
     // sort dependencies like npm(1)

@@ -328,7 +328,11 @@ function createApplication (name, dir) {
 
     // ELF CODE
     copyTemplate("js/public/javascripts/control.js", path.join(dir + "/public/javascripts", "control.js"));
-    copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
+    //copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
+
+    // destination.txt will be created or overwritten by default.
+    fs.copyFileSync("images/favicon.ico", path.join(dir + "/public/favicon.ico"));
+    //console.log('source.txt was copied to destination.txt');
 
     // sort dependencies like npm(1)
     pkg.dependencies = sortedObject(pkg.dependencies);

@@ -344,6 +344,7 @@ function createApplication (name, dir) {
     copyTemplate("bower.json", path.join(dir, 'bower.json'));
     copyTemplate(".bowerrc", path.join(dir, '.bowerrc'));
     copyTemplate("nodemon.json", path.join(dir, 'nodemon.json'));
+    copyTemplate("README.md", path.join(dir, 'README.md'));
     copyTemplate("webpack.config.js", path.join(dir, 'webpack.config.js'));
     //copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
 

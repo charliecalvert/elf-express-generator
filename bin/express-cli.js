@@ -328,8 +328,11 @@ function createApplication (name, dir) {
 
     // ELF CODE
     copyTemplate("js/public/javascripts/control.js", path.join(dir + "/public/javascripts", "control.js"));
-    copyTemplate(".babelrc", path.join(dir + "/.", '.babelrc'));
+    copyTemplate(".babelrc", path.join(dir, '.babelrc'));
     copyTemplate("bower.json", path.join(dir, 'bower.json'));
+    copyTemplate("bower.json", path.join(dir, '.bowerrc'));
+    copyTemplate("bower.json", path.join(dir, 'nodemon.json'));
+    copyTemplate("bower.json", path.join(dir, 'webpack.config.js'));
     //copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
 
     // destination.txt will be created or overwritten by default.

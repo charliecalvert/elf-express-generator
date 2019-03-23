@@ -332,7 +332,7 @@ function createApplication (name, dir) {
     }
 
     // ELF CODE
-    copyTemplate("js/public/javascripts/control.js", path.join(dir + "/public/javascripts", "control.js"));
+    copyTemplate("js/public/javascripts/control.js", path.join(dir + "/source", "control.js"));
     copyTemplate(".babelrc", path.join(dir, '.babelrc'));
     copyTemplate("bower.json", path.join(dir, 'bower.json'));
     copyTemplate(".bowerrc", path.join(dir, '.bowerrc'));

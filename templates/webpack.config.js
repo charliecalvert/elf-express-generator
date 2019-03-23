@@ -3,7 +3,7 @@
 console.log(__dirname);
 module.exports = {
     mode: 'development',
-    entry: './source/main.js',
+    entry: './source/control.js',
     output: {
         path: __dirname + '/public/',
         filename: 'bundle.js'

@@ -242,7 +242,6 @@ function createApplication (name, dir) {
     } else {
         // Copy extra public files
         copyTemplate("js/index.html", path.join(dir, "public/index.html"));
-        copyTemplate(".babelrc", path.join(dir, '.babelrc'));
     }
 
     // CSS Engine support
@@ -329,6 +328,7 @@ function createApplication (name, dir) {
 
     // ELF CODE
     copyTemplate("js/public/javascripts/control.js", path.join(dir + "/public/javascripts", "control.js"));
+    copyTemplate(".babelrc", path.join(dir, '.babelrc'));
     //copyTemplate("images/favicon.ico", path.join(dir + "/public", "favicon.ico"));
 
     // destination.txt will be created or overwritten by default.

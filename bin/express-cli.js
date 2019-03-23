@@ -142,11 +142,12 @@ function createApplication (name, dir) {
         version: "0.0.0",
         private: true,
         scripts: {
-            start: "nodemon ./bin/www"
+            "start": "nodemon ./bin/www",
+            "build": "node_modules/.bin/webpack"
         },
         dependencies: {
             "debug": "~4.1.1",
-            "express": "~4.16.1"
+            "express": "~4.16.4"
         }
     };
 
@@ -166,7 +167,7 @@ function createApplication (name, dir) {
     // Request logger
     app.locals.modules.logger = "morgan";
     app.locals.uses.push("logger('dev')");
-    pkg.dependencies.morgan = "~1.9.0";
+    pkg.dependencies.morgan = "~1.9.1";
 
     // Body parsers
     app.locals.uses.push("express.json()");
@@ -175,7 +176,7 @@ function createApplication (name, dir) {
     // Cookie parser
     app.locals.modules.cookieParser = "cookie-parser";
     app.locals.uses.push("cookieParser()");
-    pkg.dependencies["cookie-parser"] = "~1.4.3";
+    pkg.dependencies["cookie-parser"] = "~1.4.4";
 
     if (dir !== ".") {
         mkdir(dir, ".");
@@ -304,7 +305,7 @@ function createApplication (name, dir) {
             break;
         case "pug":
             app.locals.view = { engine: "pug" };
-            pkg.dependencies.pug = "2.0.0-beta11";
+            pkg.dependencies.pug = "2.0.3";
             break;
         case "twig":
             app.locals.view = { engine: "twig" };

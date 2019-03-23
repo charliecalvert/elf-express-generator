@@ -142,7 +142,7 @@ function createApplication (name, dir) {
         version: "0.0.0",
         private: true,
         scripts: {
-            start: "node ./bin/www"
+            start: "nodemon ./bin/www"
         },
         dependencies: {
             "debug": "~4.1.1",
@@ -242,6 +242,7 @@ function createApplication (name, dir) {
     } else {
         // Copy extra public files
         copyTemplate("js/index.html", path.join(dir, "public/index.html"));
+        copyTemplate(".babelrc", path.join(dir, '.babelrc'));
     }
 
     // CSS Engine support
@@ -469,8 +470,8 @@ function main () {
 
     // Default view engine
     if (program.view === true) {
-        warning("the default view engine will not be pug in future releases\n" +
-            "use `--view=pug' or `--help' for additional options");
+        warning("the default view engine us now pug\n" +
+            "use `--help' for additional options");
         program.view = "pug";
     }
 

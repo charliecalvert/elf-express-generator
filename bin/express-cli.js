@@ -148,6 +148,10 @@ function createApplication (name, dir) {
         dependencies: {
             "debug": "~4.1.1",
             "express": "~4.16.4"
+        },
+        devDependencies: {
+            "webpack": "^4.29.6",
+            "webpack-cli": "^3.3.0"
         }
     };
 

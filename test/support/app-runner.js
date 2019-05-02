@@ -7,18 +7,18 @@ var utils = require("./utils");
 
 module.exports = AppRunner;
 
-function AppRunner(dir) {
+function AppRunner (dir) {
     this.child = null;
     this.dir = dir;
     this.host = "127.0.0.1";
     this.port = 3000;
 }
 
-AppRunner.prototype.address = function address() {
+AppRunner.prototype.address = function address () {
     return { port: this.port };
 };
 
-AppRunner.prototype.start = function start(callback) {
+AppRunner.prototype.start = function start (callback) {
     var app = this;
     var done = false;
     var env = utils.childEnvironment();
@@ -35,7 +35,7 @@ AppRunner.prototype.start = function start(callback) {
         { end: false }
     );
 
-    this.child.on("exit", function onExit(code) {
+    this.child.on("exit", function onExit (code) {
         app.child = null;
 
         if (!done) {
@@ -44,12 +44,12 @@ AppRunner.prototype.start = function start(callback) {
         }
     });
 
-    function tryConnect() {
+    function tryConnect () {
         if (done || !app.child) return;
 
         var socket = net.connect(app.port, app.host);
 
-        socket.on("connect", function onConnect() {
+        socket.on("connect", function onConnect () {
             socket.end();
 
             if (!done) {
@@ -58,7 +58,7 @@ AppRunner.prototype.start = function start(callback) {
             }
         });
 
-        socket.on("error", function onError(err) {
+        socket.on("error", function onError (err) {
             socket.destroy();
 
             if (err.syscall !== "connect") {
@@ -72,10 +72,16 @@ AppRunner.prototype.start = function start(callback) {
     setImmediate(tryConnect);
 };
 
-AppRunner.prototype.stop = function stop(callback) {
-    if (this.child) {
-        kill(this.child.pid, "SIGTERM", callback);
-    } else {
+AppRunner.prototype.stop = function stop (callback) {
+    if (!this.child) {
         setImmediate(callback);
+        return;
     }
+
+    this.child.stderr.unpipe();
+    this.child.removeAllListeners("exit");
+
+    kill(this.child.pid, "SIGTERM", callback);
+
+    this.child = null;
 };

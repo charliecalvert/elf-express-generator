@@ -1,13 +1,17 @@
 "use strict";
 
+var fs = require("fs");
+var os = require("os");
 var path = require("path");
+var uid = require("uid-safe");
 
 module.exports.childEnvironment = childEnvironment;
 module.exports.parseCreatedFiles = parseCreatedFiles;
 module.exports.stripColors = stripColors;
 module.exports.stripWarnings = stripWarnings;
+module.exports.tmpDir = tmpDir;
 
-function childEnvironment() {
+function childEnvironment () {
     var env = Object.create(null);
 
     // copy the environment except for npm veriables
@@ -20,7 +24,7 @@ function childEnvironment() {
     return env;
 }
 
-function parseCreatedFiles(output, dir) {
+function parseCreatedFiles (output, dir) {
     var files = [];
     var lines = output.split(/[\r\n]+/);
     var match;
@@ -42,11 +46,19 @@ function parseCreatedFiles(output, dir) {
     return files;
 }
 
-function stripColors(str) {
+function stripColors (str) {
     // eslint-disable-next-line no-control-regex
     return str.replace(/\x1b\[(\d+)m/g, "_color_$1_");
 }
 
-function stripWarnings(str) {
+function stripWarnings (str) {
     return str.replace(/\n(?:\x20{2}warning: [^\n]+\n)+\n/g, "");
+}
+
+function tmpDir () {
+    var dirname = path.join(os.tmpdir(), uid.sync(8));
+
+    fs.mkdirSync(dirname, { mode: parseInt("0700", 8) });
+
+    return dirname;
 }

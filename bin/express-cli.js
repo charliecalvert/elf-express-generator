@@ -479,6 +479,10 @@ function main () {
     var appName = createAppName(path.resolve(destinationPath)) || "hello-world";
 
     // View engine
+    if (!program.view) {
+        program.view = true;
+    }
+
     if (program.view === true) {
         if (program.ejs) program.view = "ejs";
         if (program.hbs) program.view = "hbs";
@@ -488,7 +492,7 @@ function main () {
 
     // Default view engine
     if (program.view === true) {
-        warning("the default view engine us now pug\n" +
+        warning("Pug is the default view engine\n" +
             "use `--help' for additional options");
         program.view = "pug";
     }

@@ -143,21 +143,22 @@ function createApplication (name, dir) {
         private: true,
         scripts: {
             "start": "npx webpack --watch & nodemon ./bin/www",
-            "build": "npx webpack"
+            "build": "npx webpack",
+            "test": "jest"
         },
         dependencies: {
-            "@babel/cli": "^7.4.4",
-            "@babel/plugin-proposal-class-properties": "^7.4.4",
+            "@babel/cli": "^7.6.0",
+            "@babel/plugin-proposal-class-properties": "^7.5.5",
             "debug": "~4.1.1",
-            "express": "~4.16.4"
+            "express": "~4.17.1"
         },
         devDependencies: {
-            "@babel/core": "^7.4.4",
-            "@babel/preset-env": "^7.4.4",
+            "@babel/core": "^7.6.0",
+            "@babel/preset-env": "^7.6.0",
             "@babel/preset-react": "^7.0.0",
-            "babel-loader": "^8.0.5",
-            "webpack": "^4.30.0",
-            "webpack-cli": "^3.3.1"
+            "babel-loader": "^8.0.6",
+            "webpack": "^4.40.0",
+            "webpack-cli": "^3.3.8"
         }
     };
 

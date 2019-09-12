@@ -26,8 +26,8 @@
   "repository": "charliecalvert/elf-express-generator",
   "license": "MIT",
   "dependencies": {
-    "commander": "2.19.0",
-    "ejs": "2.6.1",
+    "commander": "3.0.1",
+    "ejs": "2.7.1",
     "minimatch": "3.0.4",
     "mkdirp": "0.5.1",
     "sorted-object": "^2.0.1"
@@ -38,15 +38,17 @@
     "elf-express": "./bin/express-cli.js"
   },
   "devDependencies": {
-    "eslint": "5.12.1",
-    "eslint-config-standard": "12.0.0",
-    "eslint-plugin-import": "2.16.0",
-    "eslint-plugin-node": "8.0.1",
-    "eslint-plugin-promise": "4.0.0",
-    "eslint-plugin-standard": "4.0.0",
-    "mocha": "3.5.3",
-    "rimraf": "2.6.3",
-    "supertest": "1.2.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "6.3.0",
+    "eslint-config-standard": "14.1.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-node": "10.0.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-standard": "4.0.1",
+    "mocha": "6.2.0",
+    "rimraf": "3.0.0",
+    "supertest": "4.0.2",
     "tree-kill": "1.2.1",
     "uid-safe": "2.1.5",
     "validate-npm-package-name": "3.0.0"

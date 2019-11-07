@@ -1,7 +1,7 @@
 {
   "name": "elf-express-generator",
   "description": "ElvenExpress' application generator",
-  "version": "4.17.20",
+  "version": "4.17.21",
   "author": "TJ Holowaychuk <tj@vision-media.ca>",
   "contributors": [
     "Charlie Calvert",

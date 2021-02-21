@@ -178,7 +178,7 @@ function createApplication (name, dir) {
     // Request logger
     app.locals.modules.logger = "morgan";
     app.locals.uses.push("logger('dev')");
-    pkg.dependencies.morgan = "~1.9.1";
+    pkg.dependencies.morgan = "~1.10.0";
 
     // Body parsers
     app.locals.uses.push("express.json()");
@@ -187,7 +187,7 @@ function createApplication (name, dir) {
     // Cookie parser
     app.locals.modules.cookieParser = "cookie-parser";
     app.locals.uses.push("cookieParser()");
-    pkg.dependencies["cookie-parser"] = "~1.4.4";
+    pkg.dependencies["cookie-parser"] = "~1.4.5";
 
     if (dir !== ".") {
         mkdir(dir, ".");
@@ -225,7 +225,7 @@ function createApplication (name, dir) {
     if (program.view) {
         // Copy view templates
         mkdir(dir, "views");
-        pkg.dependencies["http-errors"] = "~1.7.2";
+        pkg.dependencies["http-errors"] = "~1.8.0";
         switch (program.view) {
             case "dust":
                 copyTemplateMulti("views", dir + "/views", "*.dust");
@@ -317,7 +317,7 @@ function createApplication (name, dir) {
             break;
         case "pug":
             app.locals.view = { engine: "pug" };
-            pkg.dependencies.pug = "2.0.3";
+            pkg.dependencies.pug = "3.0.0";
             break;
         case "twig":
             app.locals.view = { engine: "twig" };

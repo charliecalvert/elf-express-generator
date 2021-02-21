@@ -147,18 +147,18 @@ function createApplication (name, dir) {
             "test": "jest"
         },
         dependencies: {
-            "@babel/cli": "^7.6.0",
-            "@babel/plugin-proposal-class-properties": "^7.5.5",
-            "debug": "~4.1.1",
-            "express": "~4.17.1"
+            "@babel/cli": "^7.12.17",
+            "@babel/plugin-proposal-class-properties": "^7.12.13",
+            "debug": "~4.3.1",
+            "express": "~4.17.1",
         },
         devDependencies: {
-            "@babel/core": "^7.6.0",
-            "@babel/preset-env": "^7.6.0",
-            "@babel/preset-react": "^7.0.0",
-            "babel-loader": "^8.0.6",
-            "webpack": "^4.40.0",
-            "webpack-cli": "^3.3.8"
+            "@babel/core": "^7.12.17",
+            "@babel/preset-env": "^7.12.17",
+            "@babel/preset-react": "^7.12.13",
+            "babel-loader": "^8.2.2",
+            "webpack": "^5.23.0",
+            "webpack-cli": "^4.5.0"
         }
     };
 
